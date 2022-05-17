@@ -1,0 +1,10 @@
+{
+  "name": "marketplace-contract",
+  "version": "0.0.1",
+  "description": "test 1",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "near-sdk-as": "^3.2.3"
+  }
+}
