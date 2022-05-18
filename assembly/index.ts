@@ -28,4 +28,8 @@ The return type of the function is string | null, since we can return either a p
 
 In the function body we call the get function on the products mapping, pass the key as a parameter and return the value.
 
+Warning: The key for the persistent collection should be as short as possible to reduce storage space because 
+this key will be repeated for every record in the collection. 
+Here, we only used the longer PRODUCTS key to add more readability for first-time NEAR developers.
+
 */
