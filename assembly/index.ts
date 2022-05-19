@@ -1,10 +1,29 @@
 import { PersistentUnorderedMap } from "near-sdk-as";
+import { Product, listedProducts } from "./model";
 
 export const products = new PersistentUnorderedMap<string, string>("PRODUCTS");
 
-// create a function to add a new product to the products map --- WRITE FUNCTION ---
-export function setProduct(id: string, productName: string): void {
-    products.set(id, productName);
+export function setProduct(product: Product ): void{
+    //como funciona el tipo LET: the scope (alcance) of let variables is limited to their containing block, en este caso setProduct
+    let storedProduct = listedProducts.get(product.id);
+    if(storedProduct !== null ){ // Checkeamos si el valor del product id ya existe en el mapa, si existe tiramos un Error
+        // !== checkea si el valor de algo es igual al valor de el, y si es del mismo tipo 
+        //(ej x=1 , x es integer , x === true, va a dar false, pq x es integer y true es booleano )
+        //entonces aca evalua si storedProduct (tipo Product) es distinto del tipo NULO, va a dar true, lo que significa que
+        // el producto YA EXISTE.
+        throw new Error('a product with ${product.id} already exists');
+    }
+    /*  ---------------Mapeo el producto-------------
+      que hace set? 
+            Sets the new value for the given key.
+
+            @param key — Key of the element.
+
+            @param value — The new value of the element. */
+        
+    listedProducts.set(product.id, Product.fromPayload(product)); //si no existe el producto, creamos uno nuevo, new Product object desde
+    // el payload y lo almacenamos en la listedProducts map
+
 }
 
 /* Functions that need to be invoked from the outside of the smart contract need to be exported by adding the export keyword.
@@ -17,8 +36,8 @@ To create a new entry to our products mapping we just need to call the set funct
 */
 
 // create a function to RETRIEVE a product FROM the products map --- READ FUNCTION ---
-export function getProduct(id: string): string | null {
-    return products.get(id);
+export function getProduct(id: string): Product | null {
+    return listedProducts.get(id);
 }
 
 /*
@@ -33,3 +52,7 @@ this key will be repeated for every record in the collection.
 Here, we only used the longer PRODUCTS key to add more readability for first-time NEAR developers.
 
 */
+ // Devuelve todos los productos 
+export function getProducts(): Product[] {
+    return listedProducts.values();
+}
