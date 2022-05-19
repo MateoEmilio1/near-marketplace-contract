@@ -1,7 +1,5 @@
-import { PersistentUnorderedMap } from "near-sdk-as";
 import { Product, listedProducts } from "./model";
-
-export const products = new PersistentUnorderedMap<string, string>("PRODUCTS");
+import { ContractPromiseBatch, context } from 'near-sdk-as';
 
 export function setProduct(product: Product ): void{
     //como funciona el tipo LET: the scope (alcance) of let variables is limited to their containing block, en este caso setProduct
@@ -55,4 +53,23 @@ Here, we only used the longer PRODUCTS key to add more readability for first-tim
  // Devuelve todos los productos 
 export function getProducts(): Product[] {
     return listedProducts.values();
+}
+
+// 
+export function buyProduct(productId: string): void { 
+    // Primero, retrieve (recuperamos) the product with the specified id (parametro) through the getProduct function
+    const product = getProduct(productId); 
+    if(product == null){
+        throw new Error("product not found");
+    } 
+    //We check if the attached deposit is equal to the product's price
+    if(product.price.toString() != context.attachedDeposit.toString()){
+        throw new Error("attached deposit should equal to the product's price");
+    }
+    // el metodo transfer agarra el monto de tokens que el CALLER (COMPRADOR) de la funcion tiene adjuntos a la transaccion y
+    //los transfiere al OWNER del PRODUCTO ----- ACA SE REALIZA LA COMPRA-----
+    ContractPromiseBatch.create(product.owner).transfer(context.attachedDeposit);
+    product.incrementSoldAmount(); //Function de model.ts, incrementa en 1 la cantidad de ventas del producto
+    listedProducts.set(product.id, product);
+
 }
